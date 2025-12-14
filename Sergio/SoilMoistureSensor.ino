@@ -10,6 +10,10 @@ const char* mqtt_server = "test.mosquitto.org";
 const int mqtt_port = 1883;
 const char* mqtt_topic = "SDCG-NAPIoT/soilMoisture";
 
+// Constantes de calibración 
+const int valorSeco = 0;       // Valor mínimo de humidade no solo
+const int valorMollado = 2229; // Valor máximo de humidade no solo
+
 WiFiClient espClient;
 PubSubClient client(espClient);
 
@@ -79,13 +83,22 @@ void loop() {
   // Lemos o valor analóxico
   int valorHumidade = analogRead(sensorPin);
 
-  // Enviamos o valor de humidade do solo por MQTT
-  char msg[100];
-  snprintf(msg, 100, "%d", valorHumidade);
+  // Convertemos a porcentaxe usando map()
+  int porcentaxe = map(valorHumidade, valorSeco, valorMollado, 0, 100);
+
+  // Limitamos o rango (para que non baixe de 0 nin suba de 100 por ruido)
+  porcentaxe = constrain(porcentaxe, 0, 100);
+
+  // Enviamos o valor da porcentaxe de humidade do solo por MQTT
+  char msg[10];
+  snprintf(msg, 10, "%d", porcentaxe);
 
   // Mostramos por pantalla o valor de humidade no solo
-  Serial.print("Humidade do solo: ");
-  Serial.println(valorHumidade);
+  Serial.print("Humidade do solo (analóxico): ");
+  Serial.print(valorHumidade);
+  Serial.print("| Humidade do solo (%): ");
+  Serial.print(porcentaxe);
+  Serial.println("%");
 
   // Publica a mensaxe no tópico indicado
   client.publish(mqtt_topic, msg);
