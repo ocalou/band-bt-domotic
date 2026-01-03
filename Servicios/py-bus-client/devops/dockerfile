@@ -1,0 +1,8 @@
+FROM python:3.12-alpine
+
+COPY ./resources /opt/resources
+COPY ./src /opt/src
+
+RUN pip install -r /opt/resources/requirements.txt
+
+ENTRYPOINT ['python /opt/src/main.py']

@@ -1,0 +1,8 @@
+---
+mqtt:
+  host:
+  port:
+  subscribe_topic:
+
+service:
+  delay: 1
