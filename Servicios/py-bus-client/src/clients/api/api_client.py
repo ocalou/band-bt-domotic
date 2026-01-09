@@ -2,9 +2,9 @@
 
 from requests import get, Response
 import json
-from typing import Dict
+from typing import Dict, Tuple, List
 
-from .schemas import AllBuses, BusLine, BusStop
+from .schemas import BusNetwork, BusLine, BusStop, BusStopInfo
 
 
 class APIClient:
@@ -18,7 +18,15 @@ class APIClient:
         :return APIClient
         """
         
-        self._bus_lines: AllBuses = self.get_all_buses()
+        self._bus_lines: List[BusLine]
+        self._bus_stop_info: List[BusStopInfo]
+        self._bus_lines, self._bus_stop_info = self.get_all_info()
+
+    def get_bus_lines(self) -> List[BusLine]:
+        return self._bus_lines
+
+    def get_bus_stop_info(self) -> List[BusStopInfo]:
+        return self._bus_stop_info
 
     def get_buses_in_stop(self,
                           stop: int) -> BusStop:
@@ -42,15 +50,15 @@ class APIClient:
         ret: Dict = {}
 
         for b in buses.lines:
-            ret[self._bus_lines[b.line].line_number] = b.buses
+            ret[self._bus_lines[b.line_id].line_number] = b.buses
 
         return ret
         
-    def get_all_buses(self) -> AllBuses:
+    def get_all_info(self) -> Tuple[List[BusLine], List[BusStopInfo]]:
         """
         Get all buses information
         
-        :return AllBuses: List of all available buses
+        :return BusNetwork: List of all available buses
         """
 
         resp = self._generic_request(func = 7,
@@ -58,23 +66,42 @@ class APIClient:
         
         resp = json.loads(resp.content)
 
-        bus_lines = AllBuses(**resp['iTranvias']['actualizacion'])
+        info = BusNetwork(**resp['iTranvias']['actualizacion'])
 
-        self._bus_lines = self._parse_all_buses(bus_lines.bus_lines)
+        self._bus_lines = self._parse_all_buses(info.lines)
+        self._bus_stop_info = self._parse_all_bus_stop(info.stops)
 
         # Fix due to API not including line in general request 
         self._bus_lines[2452] = BusLine(line_number = 'UDC',
                                         origin = 'Campus de Elviña',
                                         destination = 'UDC')
         
-        return self._bus_lines
+        return (self._bus_lines, self._bus_stop_info)
+    
+    def _parse_all_bus_stop(self,
+                            bus_stop_info: BusStopInfo) -> Dict[int, BusStopInfo]:
+        """
+        Convert Bus Stop info from API to dictionary
+        
+        :param bus_stop_info: List of Bus stop info
+        :type bus_stop_info: BusStopInfo
+        :return: Bus Stop Info
+        :rtype: Dict[int, BusStopInfo]
+        """
+
+        ret: Dict = {}
+
+        for i in bus_stop_info:
+            ret[i.id] = BusStopInfo(**i.model_dump())
+
+        return ret
     
     def _parse_all_buses(self,
-                           bus_lines: AllBuses) -> Dict[int, BusLine]:
+                        bus_lines: BusNetwork) -> Dict[int, BusLine]:
         """
-        Convert Buses received from API to connect with Bus Line name
+        Convert Buses received from API to dictionary
 
-        :param AllBuses bus_lines: List of all buses
+        :param BusNetwork bus_lines: List of all buses
 
         :return Dict[int, BusLine]: Dictionary with code of bus as key and Bus Line info as value
         """

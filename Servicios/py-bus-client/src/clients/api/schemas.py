@@ -1,77 +1,59 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Dict
 
 
-class BusLineAPI(BaseModel):
-    """
-    Schema for receiving the Bus Line information from the API
-    """
-
-    id: int = Field(alias ='id')
-    line_number: str = Field(alias = 'lin_comer')
-    origin: str = Field(alias = 'nombre_orig')
-    destination: str = Field(alias = 'nombre_dest')
-
+# Base model
+class APIModel(BaseModel):
+    """Common API configuration."""
     class Config:
         populate_by_name = True
         extra = 'ignore'
 
-class BusLine(BaseModel):
-    """
-    Schema for organizing the information of a Bus Line
-    """
 
-    line_number: str
-    origin: str
-    destination: str
+# Stop schemas
+class BusArrival(APIModel):
+    """Single bus arrival at a stop."""
+    bus_id: int = Field(alias='bus')
+    time: str = Field(alias='tiempo')
+    distance: str = Field(alias='distancia')
 
-    class Config:
-        extra = 'ignore'
+class StopLine(APIModel):
+    """Buses of a specific line at a stop."""
+    line_id: int = Field(alias='linea')
+    buses: List[BusArrival] = Field(default_factory=list)
 
-class BusInfoAPI(BaseModel):
-    """
-    Schema for receiving the Bus information in a specific Stop
-    """
+class BusStop(APIModel):
+    """All lines available at a stop."""
+    lines: List[StopLine] = Field(alias='lineas', default_factory=list)
 
-    bus: int = Field(alias = 'bus')
-    time: str = Field(alias = 'tiempo')
-    distance: str = Field(alias = 'distancia')
+class BusStopInfo(APIModel):
+    """Information of Bus Stop"""
+    id: int
+    name: str = Field(alias='nombre')
+    x_coord: float = Field(alias='posx')
+    y_coord: float = Field(alias='posy')
 
-    class Config:
-        populate_by_name = True
-        extra = 'ignore'
 
-class BusStopLinesAPI(BaseModel):
-    """
-    Schema for receving the Bus Line's list from the API
-    """
+# Line schemas
+class BusLine(APIModel):
+    """Static bus line information."""
+    id: int | None = None
+    line_number: str = Field(alias='lin_comer')
+    origin: str = Field(alias='nombre_orig')
+    destination: str = Field(alias='nombre_dest')
 
-    line: int = Field(alias = 'linea')
-    buses: List[BusInfoAPI] = Field(alias = 'buses',
-                                 default_factory = list)
 
-    class Config:
-        populate_by_name = True
-        extra = 'ignore'
+class BusNetwork(APIModel):
+    """All available bus lines."""
+    lines: List[BusLine] = Field(alias='lineas')
+    stops: List[BusStopInfo] = Field(alias='paradas')
 
-class BusStop(BaseModel):
-    """
-    Schema for receiving the list of Bus Line's available un the Bus Stop
-    """
+# Response Buses
+class BusInfoResponse(APIModel):
+    """Model for buses data to send via MQTT"""
+    bus: str
+    time: str
 
-    lines: List[BusStopLinesAPI] = Field(alias = 'lineas',
-                                 default_factory = list)
-
-    class Config:
-        populate_by_name = True
-        extra = 'ignore'
-
-class AllBuses(BaseModel):
-    """
-    Schema for receiving buses received from API
-    """
-
-    bus_lines: List[BusLineAPI] = Field(alias = 'lineas')
-
-    class Config:
-        extra = 'ignore'
+class Response(APIModel):
+    """Model for data to send via MQTT"""
+    buses: Dict[str, List[BusInfoResponse]]
