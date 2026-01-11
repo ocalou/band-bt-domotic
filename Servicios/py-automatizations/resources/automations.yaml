@@ -1,0 +1,10 @@
+automations:
+  - name:
+    trigger_topic:
+    conditions:
+      - value:
+        operator:
+    action:
+      topic:
+      payload:
+      retain:
