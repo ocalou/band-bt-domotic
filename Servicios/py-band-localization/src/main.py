@@ -6,15 +6,15 @@ from clients import MQTTClient, BandManager
 
 if __name__ == '__main__':
 
-    config: Configuration = Configuration.read('resources/config.yaml')
-    band_manager: BandManager = BandManager('resources/bands.yaml')
+    config: Configuration = Configuration.read('/opt/resources/config.yaml')
+    band_manager: BandManager = BandManager('/opt/resources/bands.yaml')
     mqtt_c: MQTTClient = MQTTClient(host = config.MQTT_PARAMS.host,
                                     port = config.MQTT_PARAMS.port,
                                     callback = band_manager.callback)
     
     mqtt_c.start() 
-    mqtt_c.subscribe(config.MQTT_PARAMS.subscribe_topic)
+    mqtt_c.subscribe(f'{config.MQTT_PARAMS.subscribe_topic}/#')
     
     while True:
 
-        sleep(config.SERVICE_PARAMS.delay)
+        sleep(1)

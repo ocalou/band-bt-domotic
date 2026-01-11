@@ -9,14 +9,10 @@ class MqttParams(BaseModel):
     port: int
     subscribe_topic: str
 
-class ServiceParams(BaseModel):
-
-    delay: int
 
 class Configuration(BaseModel):
 
     MQTT_PARAMS: MqttParams = Field(alias = 'mqtt')
-    SERVICE_PARAMS: ServiceParams = Field(alias = 'service')
 
     @classmethod
     def read(cls, file: str):

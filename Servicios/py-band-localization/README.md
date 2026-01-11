@@ -23,7 +23,28 @@ La estructura de ficheros es la siguiente:
 
 Para la configuracion del servicio, existe un [fichero](./resources/config.yaml) donde se pueden definir los parametros.
 
+Se puede definir en el apartado de **mqtt**:
+- **host**: ip del broker mqtt.
+- **port**: puerto del broker mqtt.
+- **subscribe_topic**: tópico al que se suscribe para recibir la señal de las pulseras bluetooth.
+
 Para la definicion de las pulseras y el usuario de cada una, existe un [fichero](./resources/bands.yaml) donde se define la MAC de la pulsera y el usuario al que le pertenece.
+
+En **bands** se define una lista de pulseras bluetooth con su MAC y el usuario al que le pertenece.
+- **mac**: MAC de la pulsera bluetooth.
+- **user**: usuario asociado a la pulsera.
+
+Por ejemplo:
+
+```yaml
+bands:
+  - mac: XXXXXXX
+    user: user
+  - mac: YYYYYYY
+    user: user2
+```
+
+
 
 ## Despliegue
 Existe un fichero [dockerfile](./devops/dockerfile) para la creacion de la imagen del contenedor docker para el despliegue del servicio.

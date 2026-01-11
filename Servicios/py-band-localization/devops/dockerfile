@@ -5,4 +5,4 @@ COPY ./src /opt/src
 
 RUN pip install -r /opt/resources/requirements.txt
 
-ENTRYPOINT ['python /opt/src/main.py']
+ENTRYPOINT ["python", "/opt/src/main.py"]

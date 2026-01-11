@@ -39,6 +39,8 @@ class MQTTClient:
         :type topic: str
         """
 
+        log.info(f'Subscribed to topic {topic}')
+
         self._client.subscribe(topic)
     
     def start(self):

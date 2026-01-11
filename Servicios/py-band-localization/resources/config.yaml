@@ -1,8 +1,5 @@
 ---
 mqtt:
-  host:
-  port:
-  subscribe_topic:
-
-service:
-  delay: 1
+  host: 172.17.0.1
+  port: 1883
+  subscribe_topic: band
