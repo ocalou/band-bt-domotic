@@ -7,7 +7,6 @@ class MqttParams(BaseModel):
 
     host: str
     port: int
-    topic: str
 
 class ServiceParams(BaseModel):
 

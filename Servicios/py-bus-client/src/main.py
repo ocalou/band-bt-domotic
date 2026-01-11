@@ -5,11 +5,13 @@ from clients import APIClient, MQTTClient, BusInfoResponse, Response, BusStopInf
 from configuration import Configuration
 from buses import BusesList
 
+MQTT_PUBLISH_TOPIC: str = 'buses'
+
 if __name__ == '__main__':
 
     api_client: APIClient = APIClient()
-    config: Configuration = Configuration.read('resources/config.yaml')
-    buses: BusesList = BusesList.read('resources/buses.yaml')
+    config: Configuration = Configuration.read('/opt/resources/config.yaml')
+    buses: BusesList = BusesList.read('/opt/resources/buses.yaml')
 
     mqtt_c: MQTTClient = MQTTClient(host = config.MQTT_PARAMS.host,
                                     port = config.MQTT_PARAMS.port)
@@ -32,6 +34,6 @@ if __name__ == '__main__':
                     buses_req.buses[info[stop].name].append(BusInfoResponse(bus = bus, time = b[0].time))
 
                 
-        mqtt_c.publish(config.MQTT_PARAMS.topic, buses_req.model_dump_json())
+        mqtt_c.publish(MQTT_PUBLISH_TOPIC, buses_req.model_dump_json())
 
         time.sleep(config.SERVICE_PARAMS.delay)

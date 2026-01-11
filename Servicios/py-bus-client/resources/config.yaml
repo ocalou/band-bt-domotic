@@ -1,8 +1,7 @@
 ---
 mqtt:
-  host: 
-  port: 
-  topic: 
+  host: 172.17.0.1
+  port: 1883
 
 service:
-  delay: 
+  delay: 30
