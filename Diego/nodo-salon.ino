@@ -202,6 +202,7 @@ void reconnect() {
     Serial.print(")...");
 
     client.setServer(FOG_SERVER, 1883);
+    client.setCallback(callback);
 
     if (client.connect(NODE_NAME)) {
 
