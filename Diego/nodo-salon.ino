@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <Servo.h>
 
 #include <WiFi.h>
@@ -19,8 +20,8 @@
 #define NODE_NAME "sedigaca_salon"
 
 // Configuración do broker MQTT
-#define FOG_SERVER ""     // Fog device (Raspberry Pi)
-#define CLOUDLET_SERVER "" // Cloudlet (PC)
+#define FOG_SERVER "10.30.172.92"     // Fog device (Raspberry Pi)
+#define CLOUDLET_SERVER "10.30.172.109" // Cloudlet (PC)
 #define MQTT_PORT 1883
 
 // Credenciais da rede Wifi
@@ -146,13 +147,15 @@ void loop() {
 
   client.loop();
 
-  unsigned long currentMillis = millis();
-
-  if (readLight)
+  if (readLight){
+    readLight = false;
     onreadLightValue();
+  }
 
-  if (detectBand)
+  if (detectBand){
+    detectBand = false;
     pBLEScan->start(1, false); 
+  }
 
 }
 
