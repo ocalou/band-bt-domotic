@@ -172,6 +172,7 @@ void setup_bluetooth() {
 
   BLEDevice::init("");
   pBLEScan = BLEDevice::getScan();
+  pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
   pBLEScan->setActiveScan(true); 
   pBLEScan->setInterval(100);
   pBLEScan->setWindow(99);  
